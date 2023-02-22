@@ -11,44 +11,69 @@ using Newtonsoft.Json;
 using Photos.Models;
 using Azure.Storage.Blobs;
 using Photos.AnalyzerService.Abstractions;
+using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace function_app
 {
     public  class PhotoStorage
     {
-        private readonly IAnalyzerService analyzerService;
+        //private readonly IAnalyzerService analyzerService;
 
-        public PhotoStorage(IAnalyzerService analyzerService)
-        {
-            this.analyzerService = analyzerService;
-        }
+        //public PhotoStorage(IAnalyzerService analyzerService)
+        //{
+        //    this.analyzerService = analyzerService;
+        //}
+        //[FunctionName("PhotoStorage")]
+        //public  async Task<IActionResult> Run(
+        //    [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "PhotoStorage")] HttpRequest req,
+        //    [Blob("photos",FileAccess.Write,Connection =Literals.StorageConnectionString)] BlobContainerClient blobContainerClient,
+        //    ILogger logger,
+        //    [CosmosDB("photos","metadata",ConnectionStringSetting = Literals.CosmosDbConnectionString,CreateIfNotExists =true)] IAsyncCollector<dynamic> items)
+        //{
+        //    var body = await new StreamReader(req.Body).ReadToEndAsync();
+        //    var request = JsonConvert.DeserializeObject<PhotoUploadModel>(body);
+        //    var newId = Guid.NewGuid();
+        //    var blobName = $"{newId}.jpg";
+        //    var bytes = Convert.FromBase64String(request.Photo);
+        //    var contents = new MemoryStream(bytes);
+
+        //    BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
+        //    await blobClient.UploadAsync(contents);
+        //   var analysisResult = await analyzerService.AnalyzeAsync(bytes);
+        //    var item = new
+        //    {
+        //        id = newId,
+        //        name = request.Name,
+        //        description = request.Description,
+        //        tags = request.Tags
+        //    };
+        //    await items.AddAsync(item);
+        //    return new OkObjectResult(newId);
+        //}
         [FunctionName("PhotoStorage")]
-        public  async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "PhotoStorage")] HttpRequest req,
-            [Blob("photos",FileAccess.Write,Connection =Literals.StorageConnectionString)] BlobContainerClient blobContainerClient,
+        public async Task<byte[]> Run(
+            [ActivityTrigger] PhotoUploadModel req,
+            [Blob("photos", FileAccess.Write, Connection = Literals.StorageConnectionString)] BlobContainerClient blobContainerClient,
             ILogger logger,
-            [CosmosDB("photos","metadata",ConnectionStringSetting = Literals.CosmosDbConnectionString,CreateIfNotExists =true)] IAsyncCollector<dynamic> items)
+            [CosmosDB("photos", "metadata", ConnectionStringSetting = Literals.CosmosDbConnectionString, CreateIfNotExists = true)] IAsyncCollector<dynamic> items)
         {
-            var body = await new StreamReader(req.Body).ReadToEndAsync();
-            var request = JsonConvert.DeserializeObject<PhotoUploadModel>(body);
             var newId = Guid.NewGuid();
             var blobName = $"{newId}.jpg";
-            var bytes = Convert.FromBase64String(request.Photo);
+            
+            var bytes = Convert.FromBase64String(req.Photo);
             var contents = new MemoryStream(bytes);
-     
+
             BlobClient blobClient = blobContainerClient.GetBlobClient(blobName);
             await blobClient.UploadAsync(contents);
-            var analysisResult = await analyzerService.AnalyzeAsync(bytes);
             var item = new
             {
                 id = newId,
-                name = request.Name,
-                description = request.Description,
-                tags = request.Tags
+                name = req.Name,
+                description = req.Description,
+                tags = req.Tags
             };
             await items.AddAsync(item);
-            return new OkObjectResult(newId);
+            return bytes;
         }
-
     }
 }

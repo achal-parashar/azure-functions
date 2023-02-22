@@ -5,9 +5,9 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "function-app", "function-app\function-app.csproj", "{4871154A-B985-4765-92C8-514CA4181A2C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photos.AnalyzerService", "..\Photos.AnalyzerService\Photos.AnalyzerService.csproj", "{FDF74E0E-FEC9-43FF-A353-2D86BA10D320}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photos.AnalyzerService", "..\Photos.AnalyzerService\Photos.AnalyzerService.csproj", "{FDF74E0E-FEC9-43FF-A353-2D86BA10D320}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Photos.AnalyzerService.Abstractions", "..\Photos.AnalyzerService.Abstractions\Photos.AnalyzerService.Abstractions.csproj", "{29F3B6E9-27C1-4ECB-A1EA-0D56EAA4B602}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Photos.AnalyzerService.Abstractions", "..\Photos.AnalyzerService.Abstractions\Photos.AnalyzerService.Abstractions.csproj", "{29F3B6E9-27C1-4ECB-A1EA-0D56EAA4B602}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

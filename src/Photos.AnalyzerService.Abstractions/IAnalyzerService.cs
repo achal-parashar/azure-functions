@@ -1,4 +1,5 @@
-﻿namespace Photos.AnalyzerService.Abstractions
+﻿using System.Threading.Tasks;
+namespace Photos.AnalyzerService.Abstractions
 {
     public interface IAnalyzerService
     {
