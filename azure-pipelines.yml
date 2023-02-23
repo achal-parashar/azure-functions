@@ -14,7 +14,7 @@ variables:
   functionAppName: 'dev-function-app-achal'
 
   # Agent VM image name
-  vmImageName: 'windows-2019'
+  vmImageName: 'ubantu-latest'
 
   # Working Directory
   workingDirectory: '$(System.DefaultWorkingDirectory)/src/function-app/function-app'
