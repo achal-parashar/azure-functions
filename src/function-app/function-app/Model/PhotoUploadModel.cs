@@ -5,6 +5,7 @@ namespace Photos.Models
 {
     public class PhotoUploadModel
     {
+
         [JsonProperty("name")]
         public string Name { get; set; }
 
