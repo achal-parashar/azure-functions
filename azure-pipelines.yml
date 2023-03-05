@@ -1,76 +1,24 @@
-# .NET Core Function App to Windows on Azure
-# Build a .NET Core function app and deploy it to Azure as a Windows function App.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/en-us/azure/devops/pipelines/languages/dotnet-core
-
 trigger:
 - master
 
-variables:
-  # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: '174a7d2f-244e-415a-a613-f5ac8b02c5dc'
+pool:
+  vmImage: 'ubuntu-latest'
 
-  # Function app name
-  functionAppName: 'dev-function-app-achal'
+steps:
 
-  # Agent VM image name
-  vmImageName: 'windows-2019'
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: '**/*.csproj'
+    arguments: '-o $(Build.ArtifactStagingDirectory)/Output'
+    zipAfterPublish: true
+    modifyOutputPath: true
 
-  # Working Directory
-  workingDirectory: '$(System.DefaultWorkingDirectory)/src/function-app/function-app'
-
-stages:
-- stage: Build
-  displayName: Build stage
-
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-
-    steps:
-    - task: DotNetCoreCLI@2
-      displayName: Build
-      inputs:
-        command: 'build'
-        projects: |
-          $(workingDirectory)/*.csproj
-        arguments: --output $(System.DefaultWorkingDirectory)/publish_output --configuration Release
-
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/publish_output'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-        replaceExistingArchive: true
-
-    - publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-      artifact: drop
-
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-  condition: succeeded()
-
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy
-    environment: 'development'
-    pool:
-      vmImage: $(vmImageName)
-
-    strategy:
-      runOnce:
-        deploy:
-
-          steps:
-          - task: AzureFunctionApp@1
-            displayName: 'Azure functions app deploy'
-            inputs:
-              azureSubscription: '$(azureSubscription)'
-              appType: functionApp
-              appName: $(functionAppName)
-              package: '$(Pipeline.Workspace)/drop/$(Build.BuildId).zip'
+- task: AzureFunctionApp@1
+  inputs:
+    azureSubscription: '0efa9881-bffb-4558-8f68-6c3a3174aab9'
+    appType: 'functionAppLinux'
+    appName: 'thefunctionslinux2'
+    package: '$(Build.ArtifactStagingDirectory)/Output/Photos.zip'
+    runtimeStack: 'DOCKER|microsoft/azure-functions-dotnet-core2.0:2.0'
